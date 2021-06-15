@@ -1,0 +1,32 @@
+version: '2'
+
+services:
+  homebridge:
+    image: oznu/homebridge:ubuntu
+    restart: unless-stopped
+    hostname: homebridge
+    environment:
+      PGID: ${PGID}
+      PUID: ${PUID}
+      HOMEBRIDGE_CONFIG_UI: 1
+      HOMEBRIDGE_CONFIG_UI_PORT: 8581
+      TZ: ${TZ}
+    volumes:
+      - homebridge:/homebridge
+    networks:
+      homebridge_vlan:
+        ipv4_address: ${IPV4_ADDRESS}
+
+volumes:
+  homebridge:
+
+networks:
+  homebridge_vlan:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY}
