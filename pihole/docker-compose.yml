@@ -19,6 +19,10 @@ services:
     volumes:
       - etc_pihole-unbound:/etc/pihole:rw
       - etc_pihole_dnsmasq-unbound:/etc/dnsmasq.d:rw
+    mac_address: ${MAC_ADDRESS}
+    networks:
+      pihole_vlan:
+        ipv4_address: ${IPV4_ADDRESS}
     ports:
       - 443:443/tcp
       - 53:53/tcp
@@ -33,3 +37,14 @@ services:
 volumes:
   etc_pihole-unbound:
   etc_pihole_dnsmasq-unbound:
+
+networks:
+  pihole_vlan:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY}
