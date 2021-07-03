@@ -2,8 +2,9 @@
 The things I run on my raspberry pi
 1. [pi-hole](https://pi-hole.net)
 2. [homebridge](https://homebridge.io)
+3. [wireguard](https://www.wireguard.com)
 
-To use these files, make sure you have docker and docker-compose installed on your raspberry pi
+To use these services, make sure you have docker and docker-compose installed on your raspberry pi
 
 ```bash
 sudo apt-get update && sudo apt-get upgrade
