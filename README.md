@@ -101,7 +101,7 @@ To ensure there is
 minimal downtime when your IP address changes, run that script in a cron job
 every hour by adding the following to your crontab:
 ```bash
-55 * * * * . /home/pi/pi-services/wireguard/scripts/.env; /bin/bash /home/pi/pi-services/wireguard/scripts/dns-updater.sh
+55 * * * * . /home/pi/pi-services/scripts/.env; /bin/bash /home/pi/pi-services/scripts/dns-updater.sh
 ```
 This will run the DNS updater script on the 55th minute of every hour.
 
