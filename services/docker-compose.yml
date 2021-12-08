@@ -1,0 +1,91 @@
+version: '3.1'
+
+services:
+  webserver:
+    container_name: nginx
+    image: nginx:latest
+    restart: unless-stopped
+    volumes:
+      - ./templates:/etc/nginx/templates
+    ports:
+      - "80:80"
+    environment:
+      NGINX_HOST: ${NGINX_HOST}
+      NGINX_PORT: ${NGINX_PORT}
+      DEST_PORT: ${HOMEBRIDGE_CONFIG_UI_PORT}
+  homebridge:
+    container_name: homebridge
+    image: oznu/homebridge:ubuntu
+    restart: unless-stopped
+    hostname: homebridge
+    network_mode: host
+    environment:
+      PGID: ${PGID}
+      PUID: ${PUID}
+      HOMEBRIDGE_CONFIG_UI: 1
+      HOMEBRIDGE_CONFIG_UI_PORT: ${HOMEBRIDGE_CONFIG_UI_PORT}
+      DSM_HOSTNAME: myhostname
+      TZ: ${TZ}
+    volumes:
+      - homebridge:/homebridge
+  pihole:
+    container_name: pihole
+    image: juampe/pihole-dot:latest
+    restart: unless-stopped
+    hostname: ${HOSTNAME}
+    environment:
+      ServerIP: ${ServerIP}
+      TZ: ${TZ}
+      WEBPASSWORD: ${WEBPASSWORD}
+      DOT_UPSTREAM: ${DOT_UPSTREAM}
+      DNS1: 127.0.0.1#5353 # Hardcoded to our Unbound server
+      DNS2: null # Hardcoded to our Unbound server
+      DNSSEC: "true" # Enable DNSSEC
+    volumes:
+      - etc_pihole-unbound:/etc/pihole:rw
+      - etc_pihole_dnsmasq-unbound:/etc/dnsmasq.d:rw
+    mac_address: ${MAC_ADDRESS}
+    networks:
+      pihole_vlan:
+        ipv4_address: ${IPV4_ADDRESS}
+    cap_add:
+      - NET_ADMIN
+      - SYS_NICE
+  wireguard:
+    container_name: wireguard
+    image: ghcr.io/linuxserver/wireguard
+    restart: unless-stopped
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      TZ: ${TZ}
+      SERVERURL: ${DOMAIN}
+      SERVERPORT: ${SERVERPORT}
+      PEERS: ${PEERS}
+      PEERDNS: auto
+      INTERNAL_SUBNET: ${INTERNAL_SUBNET}
+      ALLOWEDIPS: 0.0.0.0/0
+    volumes:
+      - /opt/wireguard/config:/config
+      - /lib/modules:/lib/modules
+    ports:
+      - ${SERVERPORT}:${SERVERPORT}/udp
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+volumes:
+  homebridge: null
+  etc_pihole-unbound: null
+  etc_pihole_dnsmasq-unbound: null
+networks:
+  pihole_vlan:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      driver: default
+      config:
+        - subnet: ${SUBNET}
+          gateway: ${GATEWAY}
