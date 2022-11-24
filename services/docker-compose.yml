@@ -12,7 +12,8 @@ services:
     environment:
       NGINX_HOST: ${NGINX_HOST}
       NGINX_PORT: ${NGINX_PORT}
-      DEST_PORT: ${HOMEBRIDGE_CONFIG_UI_PORT}
+      HOMEBRIDGE_PORT: ${HOMEBRIDGE_CONFIG_UI_PORT}
+      PIHOLE_PORT: ${PIHOLE_UI_PORT}
   homebridge:
     container_name: homebridge
     image: oznu/homebridge:ubuntu
@@ -39,15 +40,15 @@ services:
       WEBPASSWORD: ${WEBPASSWORD}
       DOT_UPSTREAM: ${DOT_UPSTREAM}
       DNS1: 127.0.0.1#5353 # Hardcoded to our Unbound server
-      DNS2: null # Hardcoded to our Unbound server
-      DNSSEC: "true" # Enable DNSSEC
+      DNS2: null           # Hardcoded to our Unbound server
+      DNSSEC: "true"       # Enable DNSSEC
     volumes:
       - etc_pihole-unbound:/etc/pihole:rw
       - etc_pihole_dnsmasq-unbound:/etc/dnsmasq.d:rw
-    mac_address: ${MAC_ADDRESS}
-    networks:
-      pihole_vlan:
-        ipv4_address: ${IPV4_ADDRESS}
+      - ./resolv.conf:/etc/resolv.conf
+    ports:
+      - ${PIHOLE_UI_PORT}:80/tcp
+      - 53:53/udp
     cap_add:
       - NET_ADMIN
       - SYS_NICE
@@ -79,13 +80,3 @@ volumes:
   homebridge: null
   etc_pihole-unbound: null
   etc_pihole_dnsmasq-unbound: null
-networks:
-  pihole_vlan:
-    driver: macvlan
-    driver_opts:
-      parent: eth0
-    ipam:
-      driver: default
-      config:
-        - subnet: ${SUBNET}
-          gateway: ${GATEWAY}
