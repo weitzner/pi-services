@@ -18,14 +18,13 @@ services:
     container_name: homebridge
     image: oznu/homebridge:ubuntu
     restart: unless-stopped
-    hostname: homebridge
+    hostname: home.bridge
     network_mode: host
     environment:
       PGID: ${PGID}
       PUID: ${PUID}
       HOMEBRIDGE_CONFIG_UI: 1
       HOMEBRIDGE_CONFIG_UI_PORT: ${HOMEBRIDGE_CONFIG_UI_PORT}
-      DSM_HOSTNAME: myhostname
       TZ: ${TZ}
     volumes:
       - homebridge:/homebridge
@@ -33,7 +32,7 @@ services:
     container_name: pihole
     image: juampe/pihole-dot:latest
     restart: unless-stopped
-    hostname: ${HOSTNAME}
+    hostname: pi.hole
     environment:
       ServerIP: ${ServerIP}
       TZ: ${TZ}
