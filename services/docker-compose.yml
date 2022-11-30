@@ -45,6 +45,7 @@ services:
       - etc_pihole-unbound:/etc/pihole:rw
       - etc_pihole_dnsmasq-unbound:/etc/dnsmasq.d:rw
       - ./resolv.conf:/etc/resolv.conf
+      - ./99-edns.conf:/etc/dnsmasq.d/99-edns.conf
     ports:
       - ${PIHOLE_UI_PORT}:80/tcp
       - 53:53/udp
