@@ -74,7 +74,8 @@ services:
       - /opt/wireguard/config:/config
       - /lib/modules:/lib/modules
     networks:
-      - wg-pihole
+      wg-pihole:
+        ipv4_address: 172.30.0.3 # Internal address for wireguard
     ports:
       - ${SERVERPORT}:${SERVERPORT}/udp
     sysctls:
