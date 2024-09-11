@@ -10,7 +10,7 @@ services:
     ports:
       - "80:80"
     environment:
-      NGINX_HOST: ${NGINX_HOST}
+      NGINX_HOST: ${RPI_IP}
       NGINX_PORT: ${NGINX_PORT}
       HOMEBRIDGE_PORT: ${HOMEBRIDGE_CONFIG_UI_PORT}
       PIHOLE_PORT: ${PIHOLE_UI_PORT}
@@ -34,7 +34,7 @@ services:
     restart: unless-stopped
     hostname: pi-hole.internal
     environment:
-      ServerIP: ${ServerIP}
+      ServerIP: ${RPI_IP}
       TZ: ${TZ}
       WEBPASSWORD: ${WEBPASSWORD}
       DOT_UPSTREAM: ${DOT_UPSTREAM}
