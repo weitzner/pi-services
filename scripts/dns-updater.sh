@@ -1,12 +1,12 @@
 #!/bin/bash
-# this script updates a GoDaddy DNS record to the current external IP address
+# this script updates a Cloudflare DNS record to the current external IP address
 
-#http://redsymbol.net/articles/unofficial-bash-strict-mode/
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail
 IFS=$'\n\t'
 
-URL="https://api.godaddy.com/v1/domains/${DOMAIN}/records/A/${NAME}"
-headers="Authorization: sso-key ${API_KEY}:${SECRET}"
+URL="https://api.cloudflare.com/client/v4/zones/${ZONE_ID}/dns_records/${DNS_RECORD_ID}"
+headers="Authorization: Bearer ${CLOUDFLARE_API_TOKEN}"
 
 set -x
 
@@ -20,10 +20,10 @@ currentIP=$(upnpc -s | grep ^ExternalIPAddress | cut -c21-)
 # if the two IP addresses differ, update
 if [ $dnsIP != $currentIP ];
 then
-	request='{"data":"'$currentIP'","ttl":3600}'
-	result=$(curl -i -s -X PUT \
+	request='{"content": "'$currentIP'", "ttl": 3600}'
+	result=$(curl -i -s -X PATCH \
  -H "$headers" \
  -H "Content-Type: application/json" \
- -d [$request] "${URL}")
+ -d $request "${URL}")
 	echo $result
 fi

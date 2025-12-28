@@ -6,7 +6,7 @@ services:
     image: nginx:latest
     restart: unless-stopped
     volumes:
-      - ./templates:/etc/nginx/templates
+      - ./nginx:/etc/nginx/templates
     ports:
       - "80:80"
     environment:
@@ -28,38 +28,47 @@ services:
       TZ: ${TZ}
     volumes:
       - homebridge:/homebridge
-  pihole:
-    container_name: pihole
-    image: bweitzner/pihole-dot:latest
+  unbound:
+    container_name: unbound
+    image: "mvance/unbound-rpi:latest"
     restart: unless-stopped
-    hostname: pi-hole.internal
     environment:
-      ServerIP: ${RPI_IP}
       TZ: ${TZ}
-      WEBPASSWORD: ${WEBPASSWORD}
-      DOT_UPSTREAM: ${DOT_UPSTREAM}
-      DNS1: 127.0.0.1#5353 # Hardcoded to our Unbound server
-      DNS2: null           # Hardcoded to our Unbound server
-      DNSSEC: "false"      # Do not enable DNSSEC
     volumes:
-      - etc_pihole-unbound:/etc/pihole:rw
-      - etc_pihole_dnsmasq-unbound:/etc/dnsmasq.d:rw
-      - ./resolv.conf:/etc/resolv.conf
+      - ./unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro
     networks:
       wg-pihole:
-        ipv4_address: 172.30.0.2 # Internal address for pihole
+        ipv4_address: 172.30.0.2 # ensure unbound doesn't take pihole's ip
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    restart: unless-stopped
+    hostname: pi.hole
+    environment:
+      TZ: ${TZ}
+      FTLCONF_webserver_api_password: ${WEBPASSWORD}
+      FTLCONF_dns_listeningMode: 'SINGLE'
+      FTLCONF_dns_upstreams: unbound
+      FTLCONF_dns_hosts: ${LOCAL_DNS}
+    volumes:
+      - ./pihole/pihole:/etc/pihole
+      - ./pihole/dnsmasq.d:/etc/dnsmasq.d
     ports:
-      - ${PIHOLE_UI_PORT}:80/tcp
+      - 53:53/tcp
       - 53:53/udp
+      - ${PIHOLE_UI_PORT}:80/tcp
+      - 443:443/tcp
     cap_add:
-      - NET_ADMIN
       - SYS_NICE
+    networks:
+      wg-pihole:
+        ipv4_address: 172.30.0.3
+    depends_on:
+      - unbound
   wireguard:
     container_name: wireguard
-    image: ghcr.io/linuxserver/wireguard
+    image: linuxserver/wireguard
     restart: unless-stopped
-    dns:
-      - 172.30.0.2
     environment:
       PUID: ${PUID}
       PGID: ${PGID}
@@ -67,15 +76,11 @@ services:
       SERVERURL: ${DOMAIN}
       SERVERPORT: ${SERVERPORT}
       PEERS: ${PEERS}
-      PEERDNS: auto
+      PEERDNS: 172.30.0.3 # pihole address
       INTERNAL_SUBNET: ${INTERNAL_SUBNET}
       ALLOWEDIPS: 0.0.0.0/0
     volumes:
-      - /opt/wireguard/config:/config
-      - /lib/modules:/lib/modules
-    networks:
-      wg-pihole:
-        ipv4_address: 172.30.0.3 # Internal address for wireguard
+      - ./wireguard:/config
     ports:
       - ${SERVERPORT}:${SERVERPORT}/udp
     sysctls:
@@ -83,15 +88,15 @@ services:
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
+    networks:
+      - wg-pihole
+    depends_on:
+      - pihole
 volumes:
   homebridge: null
-  etc_pihole-unbound: null
-  etc_pihole_dnsmasq-unbound: null
 networks:
   wg-pihole:
-    name: "dns-pihole"
-    driver: bridge
     ipam:
       driver: default
       config:
-        - subnet: 172.30.0.0/24 # Internal network for pihole and wireguard
+        - subnet: 172.30.0.0/24 # internal network for unbound, pihole and wireguard
