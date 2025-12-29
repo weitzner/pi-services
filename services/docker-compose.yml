@@ -21,8 +21,8 @@ services:
     hostname: home-bridge.internal
     network_mode: host
     environment:
-      PGID: ${PGID}
       PUID: ${PUID}
+      PGID: ${PGID}
       HOMEBRIDGE_CONFIG_UI: 1
       HOMEBRIDGE_CONFIG_UI_PORT: ${HOMEBRIDGE_CONFIG_UI_PORT}
       TZ: ${TZ}
@@ -38,7 +38,7 @@ services:
       - ./unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro
     networks:
       wg-pihole:
-        ipv4_address: 172.30.0.2 # ensure unbound doesn't take pihole's ip
+        ipv4_address: 172.30.0.2 # ensure there are no ip conflicts
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
@@ -46,6 +46,8 @@ services:
     hostname: pi.hole
     environment:
       TZ: ${TZ}
+      PIHOLE_UID: ${PUID}
+      PIHOLE_GID: ${PGID}
       FTLCONF_webserver_api_password: ${WEBPASSWORD}
       FTLCONF_dns_listeningMode: 'SINGLE'
       FTLCONF_dns_upstreams: unbound
@@ -62,7 +64,7 @@ services:
       - SYS_NICE
     networks:
       wg-pihole:
-        ipv4_address: 172.30.0.3
+        ipv4_address: 172.30.0.3 # pihole ip for wireguard dns config
     depends_on:
       - unbound
   wireguard:
@@ -89,7 +91,8 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     networks:
-      - wg-pihole
+      wg-pihole:
+        ipv4_address: 172.30.0.4 # ensure there are no ip conflicts
     depends_on:
       - pihole
 volumes:
