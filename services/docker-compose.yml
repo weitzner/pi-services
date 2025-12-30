@@ -79,7 +79,7 @@ services:
       PEERS: ${PEERS}
       PEERDNS: 172.30.0.3 # pihole address
       INTERNAL_SUBNET: ${INTERNAL_SUBNET}
-      ALLOWEDIPS: 0.0.0.0/0
+      ALLOWEDIPS: 0.0.0.0/0, ::1
     volumes:
       - ./wireguard:/config
     ports:
@@ -94,8 +94,6 @@ services:
         ipv4_address: 172.30.0.4 # ensure there are no ip conflicts
     depends_on:
       - pihole
-volumes:
-  homebridge: null
 networks:
   wg-pihole:
     ipam:
