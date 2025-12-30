@@ -1,4 +1,5 @@
 .env
+services/homebridge/*
 services/local_config/*
 services/nginx/*
 services/pihole/*

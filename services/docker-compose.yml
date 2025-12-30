@@ -21,13 +21,12 @@ services:
     hostname: home-bridge.internal
     network_mode: host
     environment:
-      PUID: ${PUID}
-      PGID: ${PGID}
+      ENABLE_AVAHI: 0 # use ciao https://github.com/homebridge/homebridge/wiki/mDNS-Options
       HOMEBRIDGE_CONFIG_UI: 1
       HOMEBRIDGE_CONFIG_UI_PORT: ${HOMEBRIDGE_CONFIG_UI_PORT}
       TZ: ${TZ}
     volumes:
-      - homebridge:/homebridge
+      - ./homebridge:/homebridge
   unbound:
     container_name: unbound
     image: "mvance/unbound-rpi:latest"

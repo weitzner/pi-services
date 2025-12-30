@@ -104,6 +104,7 @@ END_CONFIG
 fi
 
 # make mount directories for containers
+mkdir -p services/homebridge
 mkdir -p services/pihole/pihole
 mkdir -p services/pihole/dnsmasq.d
 mkdir -p services/wireguard
