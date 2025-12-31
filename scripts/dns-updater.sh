@@ -10,8 +10,8 @@ headers="Authorization: Bearer ${CLOUDFLARE_API_TOKEN}"
 
 set -x
 
-# get IP address from GoDaddy's DNS record
-record=$(curl -s -X GET -H "$headers" "${URL}")
+# get IP address from Cloudflare's DNS record
+record=$(curl -s -H "$headers" "${URL}")
 dnsIP=$(echo $record | grep -oE "\b([0-9]{1,3}\.){3}[0-9]{1,3}\b")
 
 # get public IP address by asking the router
