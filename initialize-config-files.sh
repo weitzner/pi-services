@@ -26,23 +26,23 @@ if [ -f "$FILE" ]; then
 else
     cat <<'END_CONFIG' > $FILE
 # shared
-TZ=
-PGID=
-PUID=
-RPI_IP=
+TZ=""                           # find your TZ here: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+PGID=""                         # current user's gid
+PUID=""                         # current user's uid
 #nginx
-NGINX_PORT=
+RPI_IP=""                       # IP address of the docker host - make this static or set a DHCP reservation
+NGINX_PORT=""                   # probably 80
 # homebridge
-HOMEBRIDGE_CONFIG_UI_PORT=
+HOMEBRIDGE_CONFIG_UI_PORT=""   # port to run the homebridge UI on
 # wireguard
-DOMAIN=
-INTERNAL_SUBNET=
-PEERS=
-SERVERPORT=
+DOMAIN=""                       # subdomain you set to update with scripts/dns_updater.sh (e.g. vpn.whatever.com)
+INTERNAL_SUBNET=""              # must be different from your home network
+PEERS=""                        # unique key pairs to create as integer or list of names - e.g. "3" or "phone,laptop,tablet"
+SERVERPORT=""                   # port to use - you will need to forward this from your rou8ter. Default is 51820
 # pi-hole
-PIHOLE_UI_PORT=
-WEBPASSWORD=
-LOCAL_DNS=
+PIHOLE_UI_PORT=""               # port to run the pi-hole dashboard UI on
+WEBPASSWORD=""                  # passwrod used to log in to pi-hole dashboard UI
+LOCAL_DNS=""                    # list of local DNS entries (i.e. IP address hostname pairs)
 END_CONFIG
     echo "'$FILE' initialized"
 fi
