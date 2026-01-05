@@ -52,7 +52,7 @@ PUID=""                         # current user's uid
 RPI_IP=""                       # IP address of the docker host - make this static or set a DHCP reservation
 NGINX_PORT=""                   # probably 80
 # homebridge
-HOMEBRIDGE_CONFIG_UI_PORT=""   # port to run the homebridge UI on
+HOMEBRIDGE_CONFIG_UI_PORT=""    # port to run the homebridge UI on
 # wireguard
 DOMAIN=""                       # subdomain you set to update with scripts/dns_updater.sh (e.g. vpn.whatever.com)
 INTERNAL_SUBNET=""              # must be different from your home network
