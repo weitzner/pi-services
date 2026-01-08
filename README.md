@@ -60,6 +60,7 @@ PEERS=""                        # unique key pairs to create as integer or list 
 SERVERPORT=""                   # port to use - you will need to forward this from your rou8ter. Default is 51820
 # pi-hole
 PIHOLE_UI_PORT=""               # port to run the pi-hole dashboard UI on
+PIHOLE_UI_PORT_HTTPS="".        # port to run the pi-hole dashboard UI on HTTPS
 WEBPASSWORD=""                  # passwrod used to log in to pi-hole dashboard UI
 LOCAL_DNS=""                    # list of local DNS entries (i.e. IP address hostname pairs)
 ```
