@@ -1,107 +1,77 @@
 # Pi Services
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Docker Compose](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
-[![Platform](https://img.shields.io/badge/Platform-Raspberry%20Pi-C51A4A?logo=raspberrypi&logoColor=white)](https://www.raspberrypi.com/)
-[![IPv6](https://img.shields.io/badge/IPv6-Dual--Stack-success)](docs/networking.md)
-
 > Opinionated infrastructure for a privacy-first, Apple-friendly home network.
 
-Pi Services is a reproducible Docker Compose stack that provides the core infrastructure for a modern home network, including recursive DNS, network-wide ad blocking, secure remote access, and Apple Home integration.
+![License](https://img.shields.io/github/license/weitzner/pi-services)
+![Platform](https://img.shields.io/badge/platform-Raspberry%20Pi-C51A4A)
+![Docker](https://img.shields.io/badge/docker-compose-2496ED?logo=docker&logoColor=white)
 
-Designed for Raspberry Pi, it emphasizes privacy, simplicity, and long-term maintainability over unnecessary complexity.
+Pi Services is a Docker Compose stack that combines private DNS, VPN access, home automation, and reverse proxy services into a cohesive, easy-to-maintain home server.
 
 ---
 
-## Features
+## Why Pi Services?
 
-- Recursive DNS with Unbound (no third-party recursive resolver)
-- DNSSEC validation
+Many Raspberry Pi home server projects are collections of unrelated containers. Pi Services is designed as an integrated platform with:
+
+- Privacy-first recursive DNS using Unbound
 - Network-wide DNS filtering with Pi-hole
-- WireGuard VPN for secure remote access
-- Homebridge for Apple Home integration
-- nginx reverse proxy
+- Secure remote access with WireGuard
+- Apple Home integration through Homebridge
+- Simple, reproducible Docker Compose deployment
 - Dual-stack Docker networking (IPv4 + IPv6)
-- Static container addressing
-- Cloudflare Dynamic DNS updates
-- Fully managed with Docker Compose
 
 ---
 
 ## Architecture
 
 ```mermaid
-flowchart TD
+flowchart LR
 
 Clients["LAN Clients"]
 VPN["WireGuard Clients"]
 
-Clients --> P["Pi-hole"]
-VPN --> P
-
-P --> U["Unbound"]
-
-U --> Root["Internet Root DNS Servers"]
-
-subgraph Raspberry Pi
-    P
-    U
-    HB["Homebridge"]
-    NG["nginx"]
+subgraph RaspberryPi["Raspberry Pi"]
+    PiHole["Pi-hole"]
+    Unbound["Unbound"]
+    Homebridge["Homebridge"]
+    Nginx["nginx"]
 end
+
+Clients --> PiHole
+VPN --> PiHole
+PiHole --> Unbound
+Unbound --> Root["Internet DNS"]
 ```
 
-### Recursive DNS Resolution
+DNS queries are filtered by Pi-hole and resolved recursively by Unbound using the Internet DNS hierarchy with DNSSEC validation—no public recursive resolver required.
 
-```mermaid
-flowchart LR
+---
 
-Client --> PiHole["Pi-hole"]
-PiHole --> Unbound["Unbound"]
-Unbound --> Root["Root DNS"]
-Unbound --> TLD["TLD Servers"]
-Unbound --> Auth["Authoritative Servers"]
-```
+## Services
 
-Unlike many Pi-hole deployments, Unbound performs full recursive resolution directly against the Internet DNS hierarchy. No Cloudflare, Google, Quad9, or other public recursive DNS provider is required.
+| Service | Purpose |
+|----------|---------|
+| Pi-hole | Network-wide DNS filtering |
+| Unbound | Recursive DNS resolver with DNSSEC |
+| WireGuard | Secure remote VPN access |
+| Homebridge | Apple Home integration |
+| nginx | Reverse proxy for local services |
 
 ---
 
 ## Quick Start
 
-Clone the repository.
-
 ```bash
 git clone https://github.com/weitzner/pi-services.git
 cd pi-services
-```
 
-Generate the local configuration files.
-
-```bash
 ./initialize-config-files.sh
-```
 
-Edit the generated configuration.
-
-```text
-services/.env
-scripts/.env
-```
-
-Start the stack.
-
-```bash
 docker compose up -d
 ```
 
-Verify the deployment.
-
-```bash
-docker compose ps
-```
-
-For complete installation instructions, see **docs/installation.md**.
+See the installation guide for complete setup instructions.
 
 ---
 
@@ -109,51 +79,35 @@ For complete installation instructions, see **docs/installation.md**.
 
 | Guide | Description |
 |--------|-------------|
-| **installation.md** | Installation and first deployment |
-| **configuration.md** | Environment variables and customization |
-| **services.md** | Pi-hole, Unbound, WireGuard, Homebridge, and nginx |
-| **networking.md** | Docker networking, IPv4, IPv6, and service addressing |
-| **operations.md** | Updating containers, backups, and common administration |
-| **security.md** | Security model and recommended hardening |
-| **architecture.md** | Design decisions and system architecture |
+| `docs/installation.md` | Install and deploy Pi Services |
+| `docs/configuration.md` | Configure environment variables |
+| `docs/networking.md` | DNS architecture and networking |
+| `docs/services.md` | Service overview |
+| `docs/maintenance.md` | Updates, backups, and troubleshooting |
+| `docs/security.md` | Security considerations |
+| `docs/contributing.md` | Contributing guidelines |
+| `docs/roadmap.md` | Planned improvements |
 
 ---
 
 ## Design Principles
 
-Pi Services is built around a few guiding principles.
-
-- **Privacy first** — Resolve DNS without relying on public recursive resolvers.
-- **Simple by default** — Favor explicit configuration over automation.
-- **Reproducible** — Everything is managed with Docker Compose.
-- **Reliable** — Static networking and isolated services reduce operational surprises.
-- **Apple-friendly** — Integrates cleanly with Apple Home through Homebridge.
-- **Maintainable** — Documentation is treated as part of the project.
-
----
-
-## Roadmap
-
-Future improvements include:
-
-- Automatic Unbound root hints updates
-- Native IPv6 support for WireGuard clients
-- Automatic container updates
-- Health monitoring
-- Prometheus and Grafana integration
-- Backup and restore automation
-- Continuous integration
+- **Privacy first** — Resolve DNS recursively without relying on public recursive resolvers.
+- **Reproducibility** — Deploy everything with Docker Compose.
+- **Simplicity** — Keep configuration explicit and easy to understand.
+- **Reliability** — Use predictable networking and static container addressing.
+- **Apple-friendly** — Integrate cleanly with Apple Home through Homebridge.
 
 ---
 
 ## Contributing
 
-Contributions are welcome.
+Contributions, bug reports, and suggestions are welcome.
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening an issue or pull request.
+See [`docs/contributing.md`](docs/contributing.md) for details.
 
 ---
 
 ## License
 
-Licensed under the Apache License 2.0. See [LICENSE](LICENSE).
+Licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.
