@@ -32,10 +32,11 @@ services:
     environment:
       TZ: ${TZ}
     volumes:
-      - ./unbound/unbound.conf:/opt/unbound/etc/unbound/unbound.conf:ro
+      - ./unbound/forward-records.conf:/opt/unbound/etc/unbound/forward-records.conf:ro
     networks:
       wg-pihole:
         ipv4_address: 172.30.0.2 # ensure there are no ip conflicts
+        ipv6_address: fd55:edc3:aa22:30::2
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
@@ -64,6 +65,7 @@ services:
     networks:
       wg-pihole:
         ipv4_address: 172.30.0.3 # pihole ip for wireguard dns config
+        ipv6_address: fd55:edc3:aa22:30::3
     depends_on:
       - unbound
   wireguard:
@@ -92,11 +94,14 @@ services:
     networks:
       wg-pihole:
         ipv4_address: 172.30.0.4 # ensure there are no ip conflicts
+        ipv6_address: fd55:edc3:aa22:30::4
     depends_on:
       - pihole
 networks:
   wg-pihole:
+    enable_ipv6: true
     ipam:
       driver: default
       config:
         - subnet: 172.30.0.0/24 # internal network for unbound, pihole and wireguard
+        - subnet: fd55:edc3:aa22:30::/64
