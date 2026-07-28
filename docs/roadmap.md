@@ -1,31 +1,20 @@
 # Roadmap
 
-Potential future improvements for Pi Services.
+## Near Term
 
-## Networking
+- [ ] Add Docker health checks
+- [ ] Add `validate-install.sh`
+- [ ] Enable `unbound-control`
+- [ ] Document IPv6 firewall recommendations
 
-- Native IPv6 support for WireGuard clients
-- Optional DHCP with Pi-hole
-- Additional reverse proxy templates
+## Medium Term
 
-## Operations
+- [ ] Automatic Unbound root hints updates
+- [ ] Backup and restore tooling
+- [ ] GitHub Actions for configuration validation
 
-- Automatic container image updates
-- Automatic Unbound root hints updates
-- Backup and restore automation
+## Long Term
 
-## Monitoring
-
-- Health monitoring and alerting
-- Prometheus metrics
-- Grafana dashboards
-
-## Development
-
-- GitHub Actions for configuration validation
-- Automated documentation checks
-- Improved test coverage
-
----
-
-Ideas and feature requests are welcome through GitHub Issues.
+- [ ] Optional Prometheus/Grafana monitoring
+- [ ] Evaluate Docker service discovery vs. static addressing after health checks are implemented
+- [ ] Multi-host deployment support
