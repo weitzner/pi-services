@@ -6,7 +6,7 @@ services:
     volumes:
       - ./nginx:/etc/nginx/templates
     ports:
-      - "80:80"
+      - 80:80
     environment:
       NGINX_HOST: ${RPI_IP}
       NGINX_PORT: ${NGINX_PORT}
@@ -31,7 +31,7 @@ services:
       - /var/run/avahi-daemon/socket:/var/run/avahi-daemon/socket
   unbound:
     container_name: unbound
-    image: "mvance/unbound-rpi:latest"
+    image: mvance/unbound-rpi:latest
     restart: unless-stopped
     environment:
       TZ: ${TZ}
@@ -53,9 +53,11 @@ services:
       PIHOLE_UID: ${PUID}
       PIHOLE_GID: ${PGID}
       FTLCONF_webserver_api_password: ${WEBPASSWORD}
-      FTLCONF_dns_listeningMode: 'SINGLE'
+      FTLCONF_dns_listeningMode: SINGLE
       FTLCONF_dns_upstreams: unbound
       FTLCONF_dns_hosts: ${LOCAL_DNS}
+      FTLCONF_dns_reply_host_force4: true
+      FTLCONF_dns_reply_host_IPv4: ${RPI_IP}
     volumes:
       - ./pihole/pihole:/etc/pihole
       - ./pihole/dnsmasq.d:/etc/dnsmasq.d
