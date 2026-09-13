@@ -2,11 +2,15 @@
 
 Most deployment-specific settings are stored in two environment files created by `initialize-config-files.sh`.
 
+The tracked `.env.example` files define the supported variable names. The initializer copies them to untracked `.env` files with mode `0600`. Put local values only in the `.env` files, and never commit them.
+
 ---
 
 ## services/.env
 
 Configures the Docker services.
+
+Schema: `services/.env.example`
 
 Common settings include:
 
@@ -23,6 +27,8 @@ Common settings include:
 ## scripts/.env
 
 Configures the Cloudflare Dynamic DNS updater.
+
+Schema: `scripts/.env.example`
 
 Required values:
 
